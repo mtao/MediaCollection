@@ -1,0 +1,18 @@
+# Qt
+FIND_PACKAGE(Qt4 REQUIRED)
+QT4_WRAP_CPP(MediaCollection_HEADERS_MOC ${MediaCollection_HEADERS_TOMOC})
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include})
+SET(MusicDriver_SOURCES
+    src/tag.cpp
+   )
+SET(MusicDriver_HEADERS
+    include/tag.h
+   )
+
+ADD_LIBRARY(musicDriver STATIC ${MusicDriver_SOURCES} ${MusicDriver_HEADERS})
+TARGET_LINK_LIBRARIES(musicDriver tag ${QT_LIBRARIES})
