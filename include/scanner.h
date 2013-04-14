@@ -13,9 +13,13 @@ class Scanner: public QObject{
         QFileSystemWatcher * m_watcher;
         unsigned int m_max_depth=5;
         int findDepth(const QString & path);
+        void manualDirCheck(const QString & path);
+
 public slots:
         void fileChanged(const QString &);
         void dirChanged(const QString &);
+signals:
+        void newFile(const QString &);
 };
 
 #endif

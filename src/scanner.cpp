@@ -51,10 +51,15 @@ void Scanner::recursiveAddPaths(const QString & path, unsigned int depth) {
     }
 }
 
-#include <QDebug>
+
+//Note:
+//This should never be called because we are assuming that scanning all files will waste all inotify :(
 void Scanner::fileChanged(const QString & filepath) {
     qWarning()<<"File: " << filepath;
 }
+
+//Note:
+//Scanner will detect files being added but collection has to notice files not existing
 
 //TODO: deal with stuff being deleted
 void Scanner::dirChanged(const QString & path) {
@@ -72,6 +77,7 @@ void Scanner::dirChanged(const QString & path) {
             }
 
         } else {
+            emit newFile(name);
         }
     }
     /*
@@ -80,8 +86,11 @@ void Scanner::dirChanged(const QString & path) {
         recursiveAddPaths(path + tr("/")+fileList.at(i),depth+1);
     }
     */
-    qWarning() <<"Dir: " << path;
 }
+
+void Scanner::manualDirCheck(const QString & filepath) {
+}
+
 
 int Scanner::findDepth(const QString & path) {
     int min=m_max_depth + 1;
