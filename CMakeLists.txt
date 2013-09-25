@@ -45,7 +45,7 @@ SET(MediaCollection_SOURCES ${MediaCollection_SOURCES} ${MediaCollection_HEADERS
 ADD_EXECUTABLE(MediaCollection
     ${MediaCollection_SOURCES}
     ${MediaCollection_HEADERS})
-TARGET_LINK_LIBRARIES(MediaCollection musicDriver torrent_rb)
+TARGET_LINK_LIBRARIES(MediaCollection musicDriver torrent-rasterbar)
 QT5_USE_MODULES(MediaCollection Widgets Gui Sql Network)
 
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/MediaCollection DESTINATION bin)

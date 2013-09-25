@@ -12,10 +12,8 @@ class TorrentFetcher: public DownloadManager {
     public:
         TorrentFetcher(const std::shared_ptr<QNetworkAccessManager> &manager = std::make_shared<QNetworkAccessManager>(), QObject * parent = 0);
         std::shared_ptr<DownloadTask> createDownloadTask(QNetworkReply*);
-        QString getDownloadPath(const libtorrent::lazy_entry& le) const;
     public slots:
         void addTorrent(const QUrl &);
-        void torrentFetchFinished(QNetworkReply*);
     signals:
         void torrentContents(const libtorrent::lazy_entry &);
 };
@@ -37,10 +35,11 @@ class TorrentManager: public QObject {
     public:
         TorrentManager(const std::shared_ptr<QNetworkAccessManager> &manager = std::make_shared<QNetworkAccessManager>(), QObject * parent = 0);
         void setPort(int beginRange, int endRange);
+        QString getDownloadPath(const libtorrent::lazy_entry& le) const;
     public slots:
         void parseTorrentFile(const QByteArray&);
     private:
-        TorrentFetcher m_fetcher;
+        TorrentFetcher * m_fetcher;
 
         libtorrent::session m_session;
 };

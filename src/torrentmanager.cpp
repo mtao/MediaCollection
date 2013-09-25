@@ -7,7 +7,8 @@ TorrentFetcher::TorrentFetcher(const std::shared_ptr<QNetworkAccessManager> &man
 
 
 std::shared_ptr<DownloadTask> TorrentFetcher::createDownloadTask(QNetworkReply* reply) {
-    auto&& reader = std::make_shared<DownloadTask>(reply);
+    auto&& reader = std::make_shared<TorrentDownloadTask>(reply);
+    connect(reader.get(), SIGNAL(torrentFile(const QByteArray&)), parent(),SLOT(parseTorrentFile(const QByteArray&)));
     return reader;
 }
 
@@ -16,6 +17,7 @@ void TorrentFetcher::addTorrent(const QUrl& url) {
 }
 
 TorrentDownloadTask::TorrentDownloadTask(QNetworkReply* reply): DownloadTask(reply) {
+    connect(reply, SIGNAL(finished()), this, SLOT(finish()));
 }
 
 void TorrentDownloadTask::finish() {
@@ -24,14 +26,22 @@ void TorrentDownloadTask::finish() {
 }
 
 
-TorrentManager::TorrentManager(const std::shared_ptr<QNetworkAccessManager> &manager, QObject * parent): QObject(parent), m_fetcher(manager,this) {
-    connect(parent, SIGNAL(addTorrentSignal(const QUrl&)), &m_fetcher, SLOT(addTorrent(const QUrl&)));
-    connect(&m_fetcher, SIGNAL(torrentFile(const QByteArray&)), this, SLOT(parseTorrentFile(const QByteArray&)));
-    m_session.listen_on(std::make_pair(6881,6889));
+TorrentManager::TorrentManager(const std::shared_ptr<QNetworkAccessManager> &manager, QObject * parent): QObject(parent), m_fetcher(new TorrentFetcher(manager,this)) {
+    connect(parent, SIGNAL(addTorrentSignal(const QUrl&)), m_fetcher, SLOT(addTorrent(const QUrl&)));
+    //connect(&m_fetcher, SIGNAL(torrentFile(const QByteArray&)), this, SLOT(parseTorrentFile(const QByteArray&)));
+    libtorrent::error_code ec;
+    m_session.listen_on(std::make_pair(6881,6889),ec);
+    if(ec) {
+        std::cout << ec.message() << std::endl;
+    }
 }
 
 void TorrentManager::setPort(int beginRange, int endRange) {
-    m_session.listen_on(std::make_pair(beginRange, endRange));
+    libtorrent::error_code ec;
+    m_session.listen_on(std::make_pair(beginRange, endRange),ec);
+    if(ec) {
+        std::cout << ec.message() << std::endl;
+    }
 }
 
 QString TorrentManager::getDownloadPath(const libtorrent::lazy_entry& le) const {
@@ -41,13 +51,16 @@ QString TorrentManager::getDownloadPath(const libtorrent::lazy_entry& le) const 
 void TorrentManager::parseTorrentFile(const QByteArray& data) {
     libtorrent::lazy_entry le;
     libtorrent::error_code ec;
-    int ret = libtorrent::lazy_bdecode(data.constData(), data.constData()+data.length(), le);
+    int ret = libtorrent::lazy_bdecode(data.constData(), data.constData()+data.length(), le,ec);
+    if(ec) {
+        std::cout << ec.message() << std::endl;
+    }
     libtorrent::torrent_info * ti = new libtorrent::torrent_info(le, ec);
     if(ec) {
         std::cout << ec.message() << std::endl;
     }
     libtorrent::add_torrent_params p;
-    p.save_path = getDownloadPath(le);
+    p.save_path = getDownloadPath(le).toStdString();
     p.ti = ti;
     m_session.add_torrent(p,ec);
     if(ec) {
