@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.9)
 PROJECT(MediaCollection)
 
 SET(CMAKE_RUNTIME_OUTPUT_DIR ${PROJECT_BINARY_DIR}/bin)
@@ -13,42 +13,39 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Autogen'd moc code appears in the BINARY_DIR I believe
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
+# Qt
+SET(CMAKE_INCLUDE_CURRENT_DIR_ON)
+SET(CMAKE_AUTOMOC ON)
+FIND_PACKAGE(Qt5Core)
 
 ADD_SUBDIRECTORY(drivers)
+ADD_DEFINITIONS(-DBOOST_ASIO_DYN_LINK)
 
 # Source files
 SET(MediaCollection_SOURCES
     src/main.cpp
     src/mainwindow.cpp
     src/scanner.cpp
+    src/rssmanager.cpp
+    src/download_manager.cpp
+    src/torrentmanager.cpp
     )
 # Include files
-SET(MediaCollection_HEADERS_TOMOC
+SET(MediaCollection_HEADERS
     include/mainwindow.h
     include/scanner.h
-    )
-SET(MediaCollection_HEADERS
-    ${MediaCollection_HEADERS_TOMOC}
+    include/rssmanager.h
+    include/download_manager.h
+    include/torrentmanager.h
     )
 SET(MediaCollection_SOURCES ${MediaCollection_SOURCES} ${MediaCollection_HEADERS})
 
-# Qt
-SET(QT_QMAKE_EXECUTABLE qmake-qt4 qmake4 qmake)
-FIND_PACKAGE(Qt4 COMPONENTS QtCore QtOpenGL QtGui QtSql REQUIRED)
-SET(QT_USE_QTOPENGL TRUE)
-
-INCLUDE_DIRECTORIES(${QT_QTSQL_INCLUDE_DIR})
-
-
-QT4_WRAP_CPP(MediaCollection_HEADERS_MOC ${MediaCollection_HEADERS_TOMOC})
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 # Executable to build
 ADD_EXECUTABLE(MediaCollection
     ${MediaCollection_SOURCES}
-    ${MediaCollection_HEADERS}
-    ${MediaCollection_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(MediaCollection ${QT_LIBRARIES} musicDriver torrent)
+    ${MediaCollection_HEADERS})
+TARGET_LINK_LIBRARIES(MediaCollection musicDriver torrent_rb)
+QT5_USE_MODULES(MediaCollection Widgets Gui Sql Network)
 
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/MediaCollection DESTINATION bin)

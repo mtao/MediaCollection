@@ -1,8 +1,4 @@
 # Qt
-FIND_PACKAGE(Qt4 REQUIRED)
-QT4_WRAP_CPP(MediaCollection_HEADERS_MOC ${MediaCollection_HEADERS_TOMOC})
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 
@@ -15,4 +11,5 @@ SET(MusicDriver_HEADERS
    )
 
 ADD_LIBRARY(musicDriver STATIC ${MusicDriver_SOURCES} ${MusicDriver_HEADERS})
-TARGET_LINK_LIBRARIES(musicDriver tag ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(musicDriver tag)
+QT5_USE_MODULES(musicDriver Sql)
