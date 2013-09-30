@@ -3,7 +3,9 @@
 
 int main(int argc, char * argv[]) {
     QApplication app(argc,argv);
-    app.setApplicationName("Music Collection Browser");
+    QCoreApplication::setOrganizationName("mtao");
+    QCoreApplication::setOrganizationDomain("");
+    QCoreApplication::setApplicationName("MediaCollection");
     MainWindow window;
     window.show();
     return app.exec();

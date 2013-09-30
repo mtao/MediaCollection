@@ -29,6 +29,7 @@ SET(MediaCollection_SOURCES
     src/rssmanager.cpp
     src/download_manager.cpp
     src/torrentmanager.cpp
+    src/optionsmenu.cpp
     )
 # Include files
 SET(MediaCollection_HEADERS
@@ -37,6 +38,7 @@ SET(MediaCollection_HEADERS
     include/rssmanager.h
     include/download_manager.h
     include/torrentmanager.h
+    include/optionsmenu.h
     )
 SET(MediaCollection_SOURCES ${MediaCollection_SOURCES} ${MediaCollection_HEADERS})
 
